@@ -34,6 +34,22 @@ paths:
               schema:
                 type: string
                 example: <h1>Test</h1>
+  /template:
+    get:
+      tags:
+        - developers
+      summary: show template of movie service
+      description: |
+        show template
+      operationId: template
+      responses:
+        "200":
+          description: html page
+          content:
+            text/html:
+              schema:
+                type: string
+                example: <h1>This is my HTML template</h1>
   /json:
     get:
       tags:
@@ -48,8 +64,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MovieID'
-  /movies/{movieid}:
+                $ref: '#/components/schemas/AllMovies'
+  /movie/{movieid}:
     get:
       tags:
       - developers
@@ -77,6 +93,42 @@ paths:
                 $ref: '#/components/schemas/MovieItem'
         "400":
           description: bad input parameter
+    put:
+      tags:
+        - admins
+      summary: update a movie rate
+      description: update the rating of a movie
+      operationId: update_movie_rating
+      parameters:
+        - name: movieid
+          in: path
+          description: Movie ID.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maximum: 1
+            minimum: 1
+            type: string
+        - name: rate
+          in: query
+          description: Movie rating.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maximum: 10
+            minimum: 0
+            type: integer
+      responses:
+        "200":
+          description: rate updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieItem'
+        "400":
+          description: movie ID not found
     post:
       tags:
       - admins
@@ -101,7 +153,7 @@ paths:
             schema:
               $ref: '#/components/schemas/MovieItem'
       responses:
-        "200":
+        "201":
           description: Movie created
           content:
             application/json:
@@ -129,9 +181,13 @@ paths:
       responses:
         "200":
           description: item deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieItem'
         "400":
           description: ID not found
-  /titles:
+  /moviebytitle:
     get:
       tags:
       - developers
@@ -158,62 +214,64 @@ paths:
               schema:
                 $ref: '#/components/schemas/MovieItem'
         "400":
-          description: bad input parameter
-  /movies/{movieid}/{rate}:
-    put:
+          description: Movie not found
+  /moviesbydirector:
+    get:
       tags:
-      - admins
-      summary: update a movie rate
-      description: update the rating of a movie
-      operationId: update_movie_rating
+        - developers
+      summary: get the movie by its director
+      description: |
+        By passing in the appropriate options, you can get Movie info
+      operationId: get_movies_bydirector
       parameters:
-      - name: movieid
-        in: path
-        description: Movie ID.
-        required: true
-        style: simple
-        explode: false
-        schema:
-          maximum: 1
-          minimum: 1
-          type: string
-      - name: rate
-        in: path
-        description: Movie rating.
-        required: true
-        style: simple
-        explode: false
-        schema:
-          maximum: 10
-          minimum: 0
-          type: integer
+        - name: director
+          in: query
+          description: pass a director
+          required: true
+          style: form
+          explode: true
+          schema:
+            maximum: 1
+            minimum: 1
+            type: string
       responses:
         "200":
-          description: rate updated
+          description: Movie item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllMovies'
         "400":
-          description: movie ID not found
+          description: movies of this director not found
 components:
   schemas:
-    MovieID:
-      required:
-      - id
+    AllMovies:
       type: object
+      required:
+        - movies
       properties:
-        id:
-          $ref: '#/components/schemas/MovieItem'
+        movies:
+          type: array
+          items:
+            type: object
+            $ref: '#/components/schemas/MovieItem'
     MovieItem:
       required:
-      - director
-      - rating
-      - title
+        - director
+        - id
+        - rating
+        - title
       type: object
       properties:
-        title:
+        director:
           type: string
-          example: The Martian
+          example: Ryan Coogler
+        id:
+          type: string
+          example: 7daf7208-be4d-4944-a3ae-c1c2f516f3e6
         rating:
           type: string
           example: "7"
-        director:
+        title:
           type: string
-          example: Paul McGuigan
+          example: Victor Frankenstein

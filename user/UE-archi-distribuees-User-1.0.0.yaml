@@ -1,0 +1,97 @@
+---
+openapi: 3.0.0
+info:
+  title: User API
+  description: This is the API of the User service
+  contact:
+    email: jules.marche@imt-atlantique.net
+  license:
+    name: GPL v3
+    url: https://www.gnu.org/licenses/gpl-3.0.en.html
+  version: 1.0.0
+servers:
+- url: https://virtserver.swaggerhub.com/UE-archi-distribuees/Showtime/1.0.0
+  description: SwaggerHub API Auto Mocking
+- url: https://virtserver.swaggerhub.com/UE-archi-distribuees/Movie/1.0.0
+  description: SwaggerHub API Auto Mocking
+tags:
+- name: admins
+  description: Secured Admin-only calls
+- name: developers
+  description: Operations available to regular developers
+paths:
+  /:
+    get:
+      tags:
+      - developers
+      summary: home page of the service
+      description: |
+        Nothing to do
+      operationId: home
+      responses:
+        "200":
+          description: welcome message
+          content:
+            text/html:
+              schema:
+                type: string
+                example: <h1>Test</h1>
+  /get_movies_infos_of_selected_movies_by_userid:
+    get:
+      tags:
+      - developers
+      summary: get the full JSON database of movies that user has booked
+      description: By passing in the userId, you can get Movies info that user has booked
+      operationId: get_movies_infos_of_selected_movies_by_userid
+      parameters:
+        - name: userid
+          in: path
+          description: User ID.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maximum: 1
+            minimum: 1
+            type: string
+      responses:
+        "200":
+          description: Movies info booked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllMovies'
+        "400":
+          description: user not found | user hasn't booking
+components:
+  schemas:
+    AllMovies:
+      type: object
+      required:
+        - movies
+      properties:
+        movies:
+          type: array
+          items:
+            type: object
+            $ref: '#/components/schemas/Movie'
+    Movie:
+      required:
+        - director
+        - id
+        - rating
+        - title
+      type: object
+      properties:
+        director:
+          type: string
+          example: Ryan Coogler
+        id:
+          type: string
+          example: 7daf7208-be4d-4944-a3ae-c1c2f516f3e6
+        rating:
+          type: string
+          example: "7"
+        title:
+          type: string
+          example: Victor Frankenstein
