@@ -1,3 +1,4 @@
+import requests
 from flask import Flask, render_template, request, jsonify, make_response
 import json
 import sys
@@ -77,6 +78,19 @@ def get_movie_byid(movieid):
             return res
     return make_response(jsonify({"error": "Movie ID not found"}), 400)
 
+@app.route("/get-movie-by-movieid-imdb/<movieid>", methods=['GET'])
+def get_movie_byid_imbd(movieid):
+    data = requests.get('https://imdb-api.com/en/API/Title/k_84p059su/' + movieid).json()
+    if not data['errorMessage'] is None:
+        return make_response(jsonify({"error":"Movie not found"}), 400)
+    obj = {}
+    obj["id"] = data["id"]
+    obj["title"] = data["title"]
+    obj["directors"] = data["directorList"]
+    obj["type"] = data["type"]
+    obj["year"] = data["year"]
+    obj["runtimeMins"] = data["runtimeMins"]
+    return make_response(jsonify(obj), 200)
 
 @app.route("/moviebytitle/<title>", methods=['GET'])
 def get_movie_bytitle(title):
@@ -91,10 +105,19 @@ def get_movie_bytitle(title):
         res = make_response(jsonify(json), 200)
     return res
 
+@app.route("/get-movies-by-title-imdb/<title>", methods=['GET'])
+def get_movies_bytitle_imdb(title):
+    data = requests.get("https://imdb-api.com/en/API/SearchMovie/k_7ps4x3m7/" + title)
+    if data.status_code == 200 and data.json()["results"]:
+        movieJson = {}
+        movieJson["movies"] = data.json()["results"]
+        return make_response(jsonify(movieJson), 200)
+    else:
+        return make_response(jsonify({"error": "movie not found"}), 400)
 
 @app.route("/moviesbydirector/<director>", methods=['GET'])
 def get_movies_bydirector(director):
-    moviesInfos = json.loads('{"movies": []}')
+    moviesInfos = {}
     for movie in movies:
         if str(movie["director"]) == str(director):
             moviesInfos["movies"].append(movie)
@@ -105,23 +128,25 @@ def get_movies_bydirector(director):
         res = make_response(jsonify(moviesInfos), 200)
     return res
 
+@app.route("/get-ratings-by-movieid-imdb/<movieid>", methods=['GET'])
+def get_ratings_by_movieid_imbd(movieid):
+    ratingsInfos = requests.get('https://imdb-api.com/en/API/UserRatings/k_84p059su/' + movieid).json()
+    if ratingsInfos['errorMessage']:
+        return make_response(jsonify({"error":"Movie not found"}), 400)
+    ratings = {}
+    ratings["ratings"] = ratingsInfos['ratings']
+    return make_response(jsonify(ratings), 200)
+
 @app.route("/api-discover", methods=['GET'])
 def get_api_discover():
     routes = {}
     for r in app.url_map._rules:
         if not (r.rule in routes):
-            routes[r.rule] = {}
-            routes[r.rule]["functionName"] = r.endpoint
-            routes[r.rule]["methods"] = list(r.methods)
-        else:
-            if not isinstance(routes[r.rule], list):
-                tmp = routes[r.rule]
-                routes[r.rule] = []
-                routes[r.rule].append(tmp)
-            obj = {}
-            obj["functionName"] = r.endpoint
-            obj["methods"] = list(r.methods)
-            routes[r.rule].append(obj)
+            routes[r.rule] = []
+        obj = {}
+        obj["functionName"] = r.endpoint
+        obj["methods"] = list(r.methods)
+        routes[r.rule].append(obj)
 
     routes.pop("/static/<path:filename>")
     return make_response(jsonify(routes), 200)

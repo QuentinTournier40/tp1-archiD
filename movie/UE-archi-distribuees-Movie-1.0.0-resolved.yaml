@@ -114,7 +114,7 @@ paths:
           in: query
           description: Movie rating.
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             maximum: 10
@@ -158,7 +158,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MovieItem'
+                type: string
+                example: { "message" : "movie added" }
+
         "409":
           description: an existing item already exists
     delete:
@@ -187,7 +189,7 @@ paths:
                 $ref: '#/components/schemas/MovieItem'
         "400":
           description: ID not found
-  /moviebytitle:
+  /moviebytitle/{title}:
     get:
       tags:
       - developers
@@ -197,10 +199,10 @@ paths:
       operationId: get_movie_bytitle
       parameters:
       - name: title
-        in: query
+        in: path
         description: pass a title
         required: true
-        style: form
+        style: simple
         explode: true
         schema:
           maximum: 1
@@ -215,20 +217,20 @@ paths:
                 $ref: '#/components/schemas/MovieItem'
         "400":
           description: Movie not found
-  /moviesbydirector:
+  /moviesbydirector/{director}:
     get:
       tags:
         - developers
-      summary: get the movie by its director
+      summary: get movies by its director
       description: |
         By passing in the appropriate options, you can get Movie info
       operationId: get_movies_bydirector
       parameters:
         - name: director
-          in: query
+          in: path
           description: pass a director
           required: true
-          style: form
+          style: simple
           explode: true
           schema:
             maximum: 1
@@ -243,6 +245,105 @@ paths:
                 $ref: '#/components/schemas/AllMovies'
         "400":
           description: movies of this director not found
+  /get-movie-by-movieid-imdb/{movieid}:
+    get:
+      tags:
+        - developers
+      summary: get movie by its id from imdb
+      description: |
+        By passing in the appropriate options, you can get Movie info
+      operationId: get_movie_byid_imbd
+      parameters:
+        - name: movieid
+          in: path
+          description: Movie ID.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maximum: 1
+            minimum: 1
+            type: string
+      responses:
+        "200":
+          description: Movie description
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieImdb'
+        "400":
+          description: bad input parameter
+  /get-movies-by-title-imdb/{title}:
+    get:
+      tags:
+        - developers
+      summary: get movies with this title
+      description: |
+        By passing in the appropriate options, you can get all movies with this title
+      operationId: get_movies_bytitle_imdb
+      parameters:
+        - name: title
+          in: path
+          description: Movie ID.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maximum: 1
+            minimum: 1
+            type: string
+      responses:
+        "200":
+          description: Movie description
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllMoviesImdb'
+        "400":
+          description: bad input parameter
+  /get-ratings-by-movieid-imdb/{movieid}:
+    get:
+      tags:
+        - developers
+      summary: get ratings by id movie from imdb
+      description: |
+        By passing in the appropriate options, you can get ratings info
+      operationId: get_ratings_by_movieid_imbd
+      parameters:
+        - name: movieid
+          in: path
+          description: Movie ID.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maximum: 1
+            minimum: 1
+            type: string
+      responses:
+        "200":
+          description: Movie ratings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieRatingsImdb'
+        "400":
+          description: bad input parameter
+  /api-discover:
+    get:
+      tags:
+        - developers
+      summary: get all endpoints of this api
+      description: |
+        Get info about api
+      operationId: get_api_discover
+      responses:
+        "200":
+          description: All routes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllRoutes'
 components:
   schemas:
     AllMovies:
@@ -253,25 +354,145 @@ components:
         movies:
           type: array
           items:
-            type: object
             $ref: '#/components/schemas/MovieItem'
     MovieItem:
       required:
-        - director
-        - id
         - rating
         - title
+        - director
+        - id
       type: object
       properties:
-        director:
-          type: string
-          example: Ryan Coogler
-        id:
-          type: string
-          example: 7daf7208-be4d-4944-a3ae-c1c2f516f3e6
         rating:
           type: string
           example: "7"
         title:
           type: string
           example: Victor Frankenstein
+        director:
+          type: string
+          example: Ryan Coogler
+        id:
+          type: string
+          example: 7daf7208-be4d-4944-a3ae-c1c2f516f3e6
+    MovieImdb:
+      required:
+        - id
+        - title
+        - directors
+        - type
+        - year
+        - runtimeMins
+      type: object
+      properties:
+        id:
+          type: string
+          example: tt1375666
+        title:
+          type: string
+          example: Inception
+        directors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Director'
+        type:
+          type: string
+          example: Movie
+        year:
+          type: string
+          example: 2010
+        runtimeMins:
+          type: string
+          example: 148
+    MovieRatingsImdb:
+      required:
+        - ratings
+      type: object
+      properties:
+        ratings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rating'
+    Rating:
+      required:
+        - rating
+        - percent
+        - votes
+      type: object
+      properties:
+        rating:
+          type: string
+          example: 10
+        percent:
+          type: string
+          example: 37.9%
+        votes:
+          type: string
+          example: 1250
+
+    AllMoviesImdb:
+      required:
+        - movies
+      type: object
+      properties:
+        movies:
+          type: array
+          items:
+            $ref: '#/components/schemas/MovieInfo'
+    MovieInfo:
+      required:
+        - description
+        - id
+        - image
+        - resultType
+        - title
+      type: object
+      properties:
+        description:
+          type: string
+          example: (2014) (Short)
+        id:
+          type: string
+          example: tt1375666
+        image:
+          type: string
+          example: https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_Ratio0.7273_AL_.jpg%
+        resultType:
+          type: string
+          example: 1254
+        title:
+          type: string
+          example: Inception
+    Director:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          type: string
+          example: mm36f666
+        name:
+          type: string
+          example: Christopher Nolan
+    AllRoutes:
+      type: object
+      required:
+        - routeName
+      properties:
+        routeName:
+          type: array
+          items:
+            $ref: '#/components/schemas/Route'
+    Route:
+      type: object
+      required:
+        - functionName
+        - methods
+      properties:
+        functionName:
+          type: string
+          example: home
+        methods:
+          type: string
+          example: [ GET,HEAD,OPTIONS ]

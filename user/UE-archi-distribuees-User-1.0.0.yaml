@@ -10,6 +10,9 @@ info:
     url: https://www.gnu.org/licenses/gpl-3.0.en.html
   version: 1.0.0
 servers:
+# Added by API Auto Mocking Plugin
+- description: SwaggerHub API Auto Mocking
+  url: https://virtserver.swaggerhub.com/QUENTINTOURNIER/USER_API/1.0.0
 - url: https://virtserver.swaggerhub.com/UE-archi-distribuees/Showtime/1.0.0
   description: SwaggerHub API Auto Mocking
 - url: https://virtserver.swaggerhub.com/UE-archi-distribuees/Movie/1.0.0
@@ -36,10 +39,10 @@ paths:
               schema:
                 type: string
                 example: <h1>Test</h1>
-  /get_movies_infos_of_selected_movies_by_userid:
+  /get-movies-infos-of-selected-movies-by-userid/{userid}:
     get:
       tags:
-      - developers
+        - developers
       summary: get the full JSON database of movies that user has booked
       description: By passing in the userId, you can get Movies info that user has booked
       operationId: get_movies_infos_of_selected_movies_by_userid
@@ -63,6 +66,87 @@ paths:
                 $ref: '#/components/schemas/AllMovies'
         "400":
           description: user not found | user hasn't booking
+  /get-directors-by-movieid-imdb/{movieid}:
+    get:
+      tags:
+        - developers
+      summary: Get all directors
+      description: By passing the movieid, you can get directors infos
+      operationId: get_directors_by_movieid_imbd
+      parameters:
+        - name: movieid
+          in: path
+          description: Movie ID.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maximum: 1
+            minimum: 1
+            type: string
+      responses:
+        "200":
+          description: Movie's directors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllDirectors'
+        "400":
+          description: movie not found
+  /get-writers-by-movieid-imdb/{movieid}:
+    get:
+      tags:
+        - developers
+      summary: Get all writers
+      description: By passing the movieid, you can get writers infos
+      operationId: get_writers_by_movieid_imbd
+      parameters:
+        - name: movieid
+          in: path
+          description: Movie ID.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maximum: 1
+            minimum: 1
+            type: string
+      responses:
+        "200":
+          description: Movie's writers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllWriters'
+        "400":
+          description: movie not found
+  /get-actors-by-movieid-imdb/{movieid}:
+    get:
+      tags:
+        - developers
+      summary: Get all actors
+      description: By passing the movieid, you can get actors infos
+      operationId: get_actors_by_movieid_imbd
+      parameters:
+        - name: movieid
+          in: path
+          description: Movie ID.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            maximum: 1
+            minimum: 1
+            type: string
+      responses:
+        "200":
+          description: Movie's actors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllActors'
+        "400":
+          description: movie not found
 components:
   schemas:
     AllMovies:
@@ -73,7 +157,6 @@ components:
         movies:
           type: array
           items:
-            type: object
             $ref: '#/components/schemas/Movie'
     Movie:
       required:
@@ -95,3 +178,82 @@ components:
         title:
           type: string
           example: Victor Frankenstein
+    AllDirectors:
+      type: object
+      required:
+        - directors
+      properties:
+        directors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Director'
+    Director:
+      type: object
+      required:
+        - description
+        - id
+        - name
+      properties:
+        description:
+          type: string
+          example: (41 episodes, 2004-2010)
+        id:
+          type: string
+          example: nm0070474
+        name:
+          type: string
+          example: Jack Bender
+    AllWriters:
+      type: object
+      required:
+        - writers
+      properties:
+        directors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Writer'
+    Writer:
+      type: object
+      required:
+        - description
+        - id
+        - name
+      properties:
+        description:
+          type: string
+          example: (created by) (118 episodes, 2004-2010)
+        id:
+          type: string
+          example: nm0009190
+        name:
+          type: string
+          example: J.J. Abrams
+    AllActors:
+      type: object
+      required:
+        - actors
+      properties:
+        directors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Actor'
+    Actor:
+      type: object
+      required:
+        - asCharacter
+        - id
+        - image
+        - name
+      properties:
+        asCharacter:
+          type: string
+          example: Hugo 'Hurley' Reyes 119 episodes, 2004-2010
+        id:
+          type: string
+          example: nm0306201
+        image:
+          type: string
+          example: https://m.media-amazon.com/images/M/MV5BMTUyNTkxODIxN15BMl5BanBnXkFtZTgwOTU2MDAwMTE@._V1_Ratio0.7273_AL_.jpg
+        name:
+          type: string
+          example: Jorge Garcia

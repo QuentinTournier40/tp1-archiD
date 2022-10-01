@@ -14,7 +14,7 @@ with open('{}/databases/users.json'.format("."), "r") as jsf:
 
 @app.route("/", methods=['GET'])
 def home():
-    return "<h1 style='color:blue'>Welcome to the User service!</h1>"
+    return make_response("<h1 style='color:blue'>Welcome to the User service!</h1>", 200)
 
 @app.route("/get-movies-infos-of-selected-movies-by-userid/<userid>", methods=['GET'])
 def get_movies_infos_of_selected_movies_by_userid(userid):
@@ -36,6 +36,32 @@ def get_movies_infos_of_selected_movies_by_userid(userid):
 
     return make_response(jsonify(moviesInfos), 200)
 
+@app.route("/get-writers-by-movieid-imdb/<movieid>", methods=['GET'])
+def get_writers_by_movieid_imdb(movieid):
+    data = requests.get('https://imdb-api.com/en/API/FullCast/k_7ps4x3m7/' + movieid).json()
+    if data['errorMessage']:
+        return make_response(jsonify({"error":"Movie not found"}), 400)
+    res = {}
+    res["writers"] = data["writers"]["items"]
+    return make_response(jsonify(res), 200)
+
+@app.route("/get-directors-by-movieid-imdb/<movieid>", methods=['GET'])
+def get_directors_by_movieid_imbd(movieid):
+    data = requests.get('https://imdb-api.com/en/API/FullCast/k_7ps4x3m7/' + movieid).json()
+    if data['errorMessage']:
+        return make_response(jsonify({"error":"Movie not found"}), 400)
+    res = {}
+    res["directors"] = data["directors"]["items"]
+    return make_response(jsonify(res), 200)
+
+@app.route("/get-actors-by-movieid-imdb/<movieid>", methods=['GET'])
+def get_actors_by_movieid_imbd(movieid):
+    data = requests.get('https://imdb-api.com/en/API/FullCast/k_7ps4x3m7/' + movieid).json()
+    if data['errorMessage']:
+        return make_response(jsonify({"error":"Movie not found"}), 400)
+    res = {}
+    res["actors"] = data["actors"]
+    return make_response(jsonify(res), 200)
 
 if __name__ == "__main__":
     print("Server running in port %s" % (PORT))
