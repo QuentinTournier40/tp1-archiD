@@ -478,7 +478,7 @@ components:
     AllRoutes:
       type: object
       required:
-        - routeName
+        - routes
       properties:
         routeName:
           type: array
@@ -489,10 +489,14 @@ components:
       required:
         - functionName
         - methods
+        - path
       properties:
         functionName:
           type: string
-          example: home
+          example: get_api_discover
         methods:
           type: string
           example: [ GET,HEAD,OPTIONS ]
+        path:
+          type: string
+          example: /api-discover

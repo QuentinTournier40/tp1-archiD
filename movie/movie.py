@@ -139,17 +139,15 @@ def get_ratings_by_movieid_imbd(movieid):
 
 @app.route("/api-discover", methods=['GET'])
 def get_api_discover():
-    routes = {}
+    allRoutes = {}
+    allRoutes["routes"] = []
     for r in app.url_map._rules:
-        if not (r.rule in routes):
-            routes[r.rule] = []
-        obj = {}
-        obj["functionName"] = r.endpoint
-        obj["methods"] = list(r.methods)
-        routes[r.rule].append(obj)
-
-    routes.pop("/static/<path:filename>")
-    return make_response(jsonify(routes), 200)
+        route = {}
+        route["path"] = r.rule
+        route["functionName"] = r.endpoint
+        route["methods"] = list(r.methods)
+        allRoutes["routes"].append(route)
+    return make_response(jsonify(allRoutes), 200)
 
 if __name__ == "__main__":
     # p = sys.argv[1]
