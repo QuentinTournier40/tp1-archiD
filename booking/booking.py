@@ -30,9 +30,6 @@ def get_booking_for_user(userid):
          return make_response(jsonify(booking), 200)
    return make_response(jsonify({"error":"booking with this id not found"}),400)
 
-
-
-//TODO Ajouter FILM à la réservation (date/ID) + Verification de que le film ne soit pas ajouté à la même date pour cette personne
 # Fonction crée par Tournier Quentin et Marche Jules
 # But: Ajouter une réservation à un utilisateur
 # En entrée: UserId(path)
@@ -65,7 +62,7 @@ def add_booking_byuser(userid):
       return make_response(jsonify({"message": "booking added"}), 200)
    else :
       return make_response(jsonify({"message": "UserId not found"}), 400)
-
+   
 if __name__ == "__main__":
    print("Server running in port %s"%(PORT))
    app.run(host=HOST, port=PORT)
