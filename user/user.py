@@ -16,6 +16,11 @@ with open('{}/databases/users.json'.format("."), "r") as jsf:
 def home():
     return make_response("<h1 style='color:blue'>Welcome to the User service!</h1>", 200)
 
+
+# Fonction crée par Tournier Quentin et Marche Jules
+# But: Afficher toutes les informations des movies réservés par l'utilisateur
+# En entrée: UserId(path)
+# En sortie: Un tableau de toutes les informations
 @app.route("/get-movies-infos-of-selected-movies-by-userid/<userid>", methods=['GET'])
 def get_movies_infos_of_selected_movies_by_userid(userid):
     moviesInfos = json.loads('{"movies": []}')
@@ -36,6 +41,11 @@ def get_movies_infos_of_selected_movies_by_userid(userid):
 
     return make_response(jsonify(moviesInfos), 200)
 
+
+# Fonction crée par Tournier Quentin et Marche Jules
+# But: Afficher toutes les auteurs d'un movie de la BDD IMDB
+# En entrée: MovieId(path)
+# En sortie: Un tableau de tous les auteurs
 @app.route("/get-writers-by-movieid-imdb/<movieid>", methods=['GET'])
 def get_writers_by_movieid_imdb(movieid):
     data = requests.get('https://imdb-api.com/en/API/FullCast/k_7ps4x3m7/' + movieid).json()
@@ -45,6 +55,11 @@ def get_writers_by_movieid_imdb(movieid):
     res["writers"] = data["writers"]["items"]
     return make_response(jsonify(res), 200)
 
+
+# Fonction crée par Tournier Quentin et Marche Jules
+# But: Afficher toutes les directeurs d'un movie de la BDD IMDB
+# En entrée: MovieId(path)
+# En sortie: Un tableau de tous les directeurs
 @app.route("/get-directors-by-movieid-imdb/<movieid>", methods=['GET'])
 def get_directors_by_movieid_imbd(movieid):
     data = requests.get('https://imdb-api.com/en/API/FullCast/k_7ps4x3m7/' + movieid).json()
@@ -54,6 +69,11 @@ def get_directors_by_movieid_imbd(movieid):
     res["directors"] = data["directors"]["items"]
     return make_response(jsonify(res), 200)
 
+
+# Fonction crée par Tournier Quentin et Marche Jules
+# But: Afficher toutes les acteurs d'un movie de la BDD IMDB
+# En entrée: MovieId(path)
+# En sortie: Un tableau de tous les acteurs
 @app.route("/get-actors-by-movieid-imdb/<movieid>", methods=['GET'])
 def get_actors_by_movieid_imbd(movieid):
     data = requests.get('https://imdb-api.com/en/API/FullCast/k_7ps4x3m7/' + movieid).json()

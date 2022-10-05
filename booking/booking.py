@@ -19,6 +19,10 @@ def home():
 def get_json():
    return make_response(jsonify(bookings), 200)
 
+# Fonction crée par Tournier Quentin et Marche Jules
+# But: Afficher toutes les réservations d'un Utilisateur
+# En entrée: UserId(path)
+# En sortie: Un tableau de toutes les réservations
 @app.route("/bookings/<userid>", methods=['GET'])
 def get_booking_for_user(userid):
    for booking in bookings:
@@ -26,6 +30,13 @@ def get_booking_for_user(userid):
          return make_response(jsonify(booking), 200)
    return make_response(jsonify({"error":"booking with this id not found"}),400)
 
+
+
+//TODO Ajouter FILM à la réservation (date/ID) + Verification de que le film ne soit pas ajouté à la même date pour cette personne
+# Fonction crée par Tournier Quentin et Marche Jules
+# But: Ajouter une réservation à un utilisateur
+# En entrée: UserId(path)
+# En sortie: Un message stipulant l'ajout de la réservation
 @app.route("/bookings/<userid>", methods=['POST'])
 def add_booking_byuser(userid):
    req = request.get_json()
