@@ -30,12 +30,30 @@ def get_booking_for_user(userid):
 def add_booking_byuser(userid):
    req = request.get_json()
 
+   # Récuépration des shedule et verification de la projection à la date donnée en paramètre
+   shedule = requests.get("http://172.16.127.207:3202/showmovies/" + str(req["date"])).json()
+   sheduleExist = False
+   for moviesShownId in shedule["movies"]:
+      if req["movieid"] == moviesShownId:
+         sheduleExist = True
+
+   if not sheduleExist:
+      return make_response(jsonify({"message": "Movie not shown at this date"}), 400)
+
    for booking in bookings:
       if str(booking["userid"]) == str(userid):
-         return make_response(jsonify({"error": "booking ID already exists"}), 409)
+         bookingUser = booking
+         for bookingDateInfo in booking["dates"]:
+            if bookingDateInfo["date"] == str(req["date"]):
+               for movie in bookingDateInfo["movies"]:
+                  if movie == req["movieid"] :
+                     return make_response(jsonify({"error": "This booking already exists for this movie at this date"}), 409)
 
-   bookings.append(req)
-   return make_response(jsonify({"message": "booking added"}), 200)
+   if 'bookingUser' in locals():
+      bookingUser["dates"].append(req)
+      return make_response(jsonify({"message": "booking added"}), 200)
+   else :
+      return make_response(jsonify({"message": "UserId not found"}), 400)
 
 if __name__ == "__main__":
    print("Server running in port %s"%(PORT))
