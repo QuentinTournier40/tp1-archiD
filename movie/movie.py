@@ -15,7 +15,7 @@ with open('{}/databases/movies.json'.format("."), "r") as jsf:
 # Fonction crée par Tournier Quentin et Marche Jules
 # But: Modifier le rate d'un movie
 # En entrée: IdMovie (path)
-#            rate (query)
+#            rate (body)
 # En sortie: Json de l'objet modifié
 @app.route("/movie/<movieid>", methods=['PUT'])
 def update_movie_rating(movieid):

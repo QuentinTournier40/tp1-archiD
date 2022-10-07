@@ -1,7 +1,6 @@
-from flask import Flask, render_template, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response
 import requests
 import json
-from werkzeug.exceptions import NotFound
 
 app = Flask(__name__)
 
@@ -32,37 +31,58 @@ def get_booking_for_user(userid):
 
 # Fonction crée par Tournier Quentin et Marche Jules
 # But: Ajouter une réservation à un utilisateur
-# En entrée: UserId(path)
-# En sortie: Un message stipulant l'ajout de la réservation
+# En entrée: UserId(path), movieid et date(body)
+# En sortie: Un message stipulant l'ajout de la réservation ou d'erreur
 @app.route("/bookings/<userid>", methods=['POST'])
 def add_booking_byuser(userid):
    req = request.get_json()
 
-   # Récuépration des shedule et verification de la projection à la date donnée en paramètre
-   shedule = requests.get("http://172.16.127.207:3202/showmovies/" + str(req["date"])).json()
+   # Recupération des films diffusés à la date donnée
+   sheduleJson = requests.get("http://localhost:3202/show-movies/" + str(req["date"])).json()
    sheduleExist = False
-   for moviesShownId in shedule["movies"]:
+
+   # Check si l'utilisateur existe
+   bookingOfUser = {}
+   for booking in bookings:
+      if booking["userid"] == str(userid):
+         bookingOfUser = booking
+
+   if not bool(bookingOfUser):
+      return make_response(jsonify({"message": "UserId not found"}), 400)
+
+   # Check si le film est diffusé à la date donnée
+   for moviesShownId in sheduleJson["movies"]:
       if req["movieid"] == moviesShownId:
          sheduleExist = True
 
    if not sheduleExist:
       return make_response(jsonify({"message": "Movie not shown at this date"}), 400)
 
-   for booking in bookings:
-      if str(booking["userid"]) == str(userid):
-         bookingUser = booking
-         for bookingDateInfo in booking["dates"]:
-            if bookingDateInfo["date"] == str(req["date"]):
-               for movie in bookingDateInfo["movies"]:
-                  if movie == req["movieid"] :
-                     return make_response(jsonify({"error": "This booking already exists for this movie at this date"}), 409)
+   # Check si l'utilisateur a deja reservé un film à la date demandée
+   dateInfosOfBooking = {}
+   for bookingDateInfo in bookingOfUser["dates"]:
+      if bookingDateInfo["date"] == str(req["date"]):
+         dateInfosOfBooking = bookingDateInfo
 
-   if 'bookingUser' in locals():
-      bookingUser["dates"].append(req)
-      return make_response(jsonify({"message": "booking added"}), 200)
-   else :
-      return make_response(jsonify({"message": "UserId not found"}), 400)
-   
+   # Si il a deja un film reservé à la date demandé il faut verifier que ce n'est pas celui qu'il demande maintenant
+   if bool(dateInfosOfBooking):
+      for movieid in dateInfosOfBooking["movies"]:
+         if movieid == req["movieid"]:
+            return make_response(jsonify({"error": "This booking already exists for this movie at this date"}), 409)
+
+   # Mise à jour de la BDD
+   indexBookingOfUser = bookings.index(bookingOfUser)
+   if bool(dateInfosOfBooking):
+      # Si l'user possède deja une reservation pour la date demandée
+      indexDate = bookingOfUser["dates"].index(dateInfosOfBooking)
+      bookingOfUser["dates"][indexDate]["movies"].append(req["movieid"])
+   else:
+      # Si l'user ne possède pas une reservation pour la date demandée
+      bookingOfUser["dates"].append(req)
+
+   bookings[indexBookingOfUser] = bookingOfUser
+   return make_response(jsonify({"message": "booking added"}), 200)
+
 if __name__ == "__main__":
    print("Server running in port %s"%(PORT))
    app.run(host=HOST, port=PORT)
