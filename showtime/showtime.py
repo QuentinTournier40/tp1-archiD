@@ -4,7 +4,7 @@ import json
 app = Flask(__name__)
 
 PORT = 3202
-HOST = '0.0.0.0'
+HOST = 'localhost'
 
 with open('{}/databases/times.json'.format("."), "r") as jsf:
    schedule = json.load(jsf)["schedule"]

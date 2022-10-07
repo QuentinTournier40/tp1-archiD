@@ -208,7 +208,7 @@ components:
       required:
         - writers
       properties:
-        directors:
+        writers:
           type: array
           items:
             $ref: '#/components/schemas/Writer'
@@ -221,19 +221,19 @@ components:
       properties:
         description:
           type: string
-          example: (created by) (118 episodes, 2004-2010)
+          example: (screenplay)
         id:
           type: string
-          example: nm0009190
+          example: nm4351467
         name:
           type: string
-          example: J.J. Abrams
+          example: Kamir Aïnouz
     AllActors:
       type: object
       required:
         - actors
       properties:
-        directors:
+        actors:
           type: array
           items:
             $ref: '#/components/schemas/Actor'

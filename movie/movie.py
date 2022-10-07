@@ -5,7 +5,7 @@ import json
 app = Flask(__name__)
 
 PORT = 3200
-HOST = '0.0.0.0'
+HOST = 'localhost'
 
 with open('{}/databases/movies.json'.format("."), "r") as jsf:
     movies = json.load(jsf)["movies"]
