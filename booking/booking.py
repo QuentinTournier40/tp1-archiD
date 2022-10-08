@@ -38,8 +38,12 @@ def add_booking_byuser(userid):
    req = request.get_json()
 
    # Recupération des films diffusés à la date donnée
-   sheduleJson = requests.get("http://localhost:3202/show-movies/" + str(req["date"])).json()
-   sheduleExist = False
+   scheduleJson = requests.get("http://localhost:3202/show-movies/" + str(req["date"])).json()
+   scheduleExist = False
+
+   # Check s'il exist un programme à la date donnée
+   if bool(scheduleJson["error"]):
+      return make_response(jsonify({"message": "0 films programed for this date"}), 400)
 
    # Check si l'utilisateur existe
    bookingOfUser = {}
@@ -51,11 +55,11 @@ def add_booking_byuser(userid):
       return make_response(jsonify({"message": "UserId not found"}), 400)
 
    # Check si le film est diffusé à la date donnée
-   for moviesShownId in sheduleJson["movies"]:
+   for moviesShownId in scheduleJson["movies"]:
       if req["movieid"] == moviesShownId:
          sheduleExist = True
 
-   if not sheduleExist:
+   if not scheduleExist:
       return make_response(jsonify({"message": "Movie not shown at this date"}), 400)
 
    # Check si l'utilisateur a deja reservé un film à la date demandée
