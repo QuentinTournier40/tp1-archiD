@@ -13,6 +13,12 @@ TP ROUGE ✅
 3. Ouvrir le projet
 4. Installer les requirements
 
+(5. Pour lancer le fichier python :   
+  5.1. Se placer dans le dossier où se trouve le fichier : taper ```cd <dossier>```  
+  5.2. Compiler le fichier : taper  ```py <fichier.py>```
+  
+ Ou bien la flèche pour lancer un fichier)
+
 NB: Nous avons décider d'utiliser PyCharm, il n'y a donc aucune installation d'environnement nécessaire au bon fonctionnement du projet si ce n'est les requirements.
 
 ## Contenu:
